@@ -1,36 +1,36 @@
-; Завдання 2: Формування масиву В з перших 8 додатних елементів масиву А
+; Task 2: Creating array В from first 8 positive elements of array А
 
 section .data
-    ; Масив А (більше 10 елементів, включаючи від'ємні)
+    ; Array А (10+ elements, including negative)
     arrayA dq -5, 3, -2, 7, 12, -8, 15, 4, -1, 9, 22, -3, 11, 6, 18
     lenA equ ($ - arrayA) / 8
     
-    msg_a db "Масив A: ", 0
+    msg_a db "Array A: ", 0
     msg_a_len equ $ - msg_a
     
-    msg_b db "Масив B (8 додатних): ", 0
+    msg_b db "Array B (8 positive elements): ", 0
     msg_b_len equ $ - msg_b
     
     space db " ", 0
     newline db 10
     
 section .bss
-    arrayB resq 8       ; Масив B для 8 додатних елементів
-    buffer resb 20      ; Буфер для конвертації чисел
+    arrayB resq 8       ; Array B of 8 positive elements
+    buffer resb 20      ; Buffer for number convertation
 
 section .text
     global _start
 
 _start:
-    ; Виводимо повідомлення про масив A
+    ; Message abt array A
     mov rax, 1
     mov rdi, 1
     mov rsi, msg_a
     mov rdx, msg_a_len
     syscall
     
-    ; Виводимо масив A
-    xor r12, r12        ; Лічильник для масиву A
+    ; Array A
+    xor r12, r12        ; Counter for array A
 .print_a:
     cmp r12, lenA
     jge .end_print_a
@@ -38,7 +38,7 @@ _start:
     mov rax, [arrayA + r12*8]
     call print_number
     
-    ; Виводимо пробіл
+    ; outpur space
     mov rax, 1
     mov rdi, 1
     mov rsi, space
@@ -49,31 +49,31 @@ _start:
     jmp .print_a
     
 .end_print_a:
-    ; Новий рядок
+    ; new line
     mov rax, 1
     mov rdi, 1
     mov rsi, newline
     mov rdx, 1
     syscall
     
-    ; Формуємо масив B
-    xor r12, r12        ; Індекс для масиву A
-    xor r13, r13        ; Лічильник додатних елементів
+    ; Array B
+    xor r12, r12        ; index for array A
+    xor r13, r13        ; positive elements counter
     
 .loop:
-    cmp r12, lenA       ; Перевірка, чи пройшли весь масив A
+    cmp r12, lenA       ; Checking if all elements of array A were checked
     jge .end_loop
     
-    cmp r13, 8          ; Перевірка, чи знайшли 8 додатних
+    cmp r13, 8          ; 8 positive found?
     jge .end_loop
     
     mov rax, [arrayA + r12*8]
     
-    ; Перевірка, чи число додатне
+    ; Checking if positive
     test rax, rax
-    jle .skip           ; Пропускаємо, якщо <= 0
+    jle .skip           ; Good to go if <= 0
     
-    ; Додаємо до масиву B
+    ; Adding to array B
     mov [arrayB + r13*8], rax
     inc r13
     
@@ -82,23 +82,23 @@ _start:
     jmp .loop
     
 .end_loop:
-    ; Виводимо повідомлення про масив B
+    ; Message abt array B
     mov rax, 1
     mov rdi, 1
     mov rsi, msg_b
     mov rdx, msg_b_len
     syscall
     
-    ; Виводимо масив B
+    ; Array B
     xor r12, r12
 .print_b:
-    cmp r12, r13        ; Виводимо тільки знайдені елементи
+    cmp r12, r13        ; Elements
     jge .end_print_b
     
     mov rax, [arrayB + r12*8]
     call print_number
     
-    ; Виводимо пробіл
+    ; Space
     mov rax, 1
     mov rdi, 1
     mov rsi, space
@@ -109,32 +109,32 @@ _start:
     jmp .print_b
     
 .end_print_b:
-    ; Новий рядок
+    ; new line
     mov rax, 1
     mov rdi, 1
     mov rsi, newline
     mov rdx, 1
     syscall
     
-    ; Вихід з програми
+    ; end of programme
     mov rax, 60
     xor rdi, rdi
     syscall
 
-; Функція для виводу числа (signed)
+; Number output (signed)
 print_number:
     push rbp
     mov rbp, rsp
     push r12
     push r13
     
-    mov r13, rax        ; Зберігаємо число
+    mov r13, rax        ; Saving
     
-    ; Перевірка на від'ємне число
+    ; Is negative?
     test rax, rax
     jns .positive
     
-    ; Виводимо мінус
+    ; minus sign
     push rax
     mov rax, 1
     mov rdi, 1
@@ -145,7 +145,7 @@ print_number:
     neg rax
     
 .positive:
-    ; Конвертуємо число в рядок
+    ; int to str
     lea rcx, [rel buffer]
     add rcx, 19
     mov byte [rcx], 0
@@ -160,7 +160,7 @@ print_number:
     test rax, rax
     jnz .convert_loop
     
-    ; Виводимо число
+    ; Output number
     mov rax, 1
     mov rdi, 1
     mov rsi, rcx
