@@ -1,7 +1,7 @@
-; Завдання 1: Обчислити g + fe/d/cb - a
+; g + fe/d/cb - a
 
 section .data
-    ; Вхідні дані
+    ; DATA
     a dq 2
     b dq 3
     c dq 4
@@ -10,8 +10,8 @@ section .data
     f dq 7
     g dq 10
     
-    ; Повідомлення для виводу
-    msg db "Результат обчислення g + fe/d/cb - a = ", 0
+    ; Message for output
+    msg db "Result g + fe/d/cb - a = ", 0
     msg_len equ $ - msg
     newline db 10
     
@@ -23,72 +23,72 @@ section .text
     global _start
 
 _start:
-    ; Обчислення виразу: g + fe/d/cb - a
-    ; Розбиваємо на частини: g + (f*e/d)/(c*b) - a
+    ; g + fe/d/cb - a
+    ; dividing into parts: g + (f*e/d)/(c*b) - a
     
-    ; 1. Обчислюємо f*e
+    ; 1. f*e
     mov rax, [f]
     imul rax, [e]       ; rax = f*e
     
-    ; 2. Ділимо на d: (f*e)/d
-    cqo                 ; Розширюємо знак rax в rdx:rax
+    ; 2. Dividing onto d: (f*e)/d
+    cqo                 ; Expanding sign rax to rdx:rax
     idiv qword [d]      ; rax = (f*e)/d
     
-    ; 3. Зберігаємо проміжний результат
+    ; 3. Saving result
     mov r10, rax        ; r10 = (f*e)/d
     
-    ; 4. Обчислюємо c*b
+    ; 4. c*b
     mov rax, [c]
     imul rax, [b]       ; rax = c*b
     
-    ; 5. Ділимо (f*e)/d на c*b
+    ; 5. Dividing (f*e)/d on c*b
     mov rbx, rax        ; rbx = c*b
     mov rax, r10        ; rax = (f*e)/d
     cqo
     idiv rbx            ; rax = (f*e)/d/(c*b)
     
-    ; 6. Додаємо g
+    ; 6. Adding g
     add rax, [g]        ; rax = g + (f*e)/d/(c*b)
     
-    ; 7. Віднімаємо a
+    ; 7. Sub a
     sub rax, [a]        ; rax = g + (f*e)/d/(c*b) - a
     
-    ; Зберігаємо результат
+    ; Saving result
     mov [result], rax
     
-    ; Виводимо повідомлення
+    ; Message
     mov rax, 1          ; sys_write
     mov rdi, 1          ; stdout
     mov rsi, msg
     mov rdx, msg_len
     syscall
     
-    ; Конвертуємо число в рядок
+    ; Number to str
     mov rax, [result]
     call print_number
     
-    ; Виводимо новий рядок
+    ; New line
     mov rax, 1
     mov rdi, 1
     mov rsi, newline
     mov rdx, 1
     syscall
     
-    ; Вихід з програми
+    ; End of programme
     mov rax, 60         ; sys_exit
-    xor rdi, rdi        ; код завершення 0
+    xor rdi, rdi        ; code 0
     syscall
 
-; Функція для виводу числа
+; number output
 print_number:
     push rbp
     mov rbp, rsp
     
-    ; Перевірка на від'ємне число
+    ; is negative?
     test rax, rax
     jns .positive
     
-    ; Виводимо мінус
+    ; minus sign
     push rax
     mov rax, 1
     mov rdi, 1
@@ -96,7 +96,7 @@ print_number:
     mov rdx, 1
     syscall
     pop rax
-    neg rax             ; Робимо число додатним
+    neg rax             ; makin' it positive
     
 .positive:
     mov rcx, buffer
@@ -113,7 +113,7 @@ print_number:
     test rax, rax
     jnz .convert_loop
     
-    ; Виводимо число
+    ; output number
     mov rax, 1
     mov rdi, 1
     mov rsi, rcx
