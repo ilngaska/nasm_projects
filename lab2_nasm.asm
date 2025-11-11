@@ -1,5 +1,5 @@
 ; lab2_nasm.asm — NASM 64-bit для Linux
-; Обчислення: (4*c + d - l) / (c - a/2)
+; (4*c + d - l) / (c - a/2)
 
 section .data
     a   dq 10
@@ -7,41 +7,41 @@ section .data
     d   dq 2
     l   dq 3
     res dq 0
-    fmt db "Результат: %ld",10,0     ; для printf
+    fmt db "Результат: %ld",10,0     ; for printf
 
 section .text
     global main
     extern printf
 
 main:
-    ; --- чисельник ---
+    ; --- numerator ---
     mov rax, [c]        ; rax = c
     shl rax, 2          ; rax = 4*c
     add rax, [d]        ; rax = 4*c + d
     sub rax, [l]        ; rax = 4*c + d - l
-    mov rbx, rax        ; rbx = чисельник
+    mov rbx, rax        ; rbx - numerator
 
-    ; --- знаменник ---
+    ; --- denominator ---
     mov rax, [a]        ; rax = a
     shr rax, 1          ; rax = a/2
     mov rcx, [c]
     sub rcx, rax        ; rcx = c - a/2
 
-    ; --- ділення ---
-    mov rax, rbx        ; rax = чисельник
-    cqo                 ; розширюємо RAX у RDX:RAX
+    ; --- division ---
+    mov rax, rbx        ; rax = numerator
+    cqo                 ; expand RAX у RDX:RAX
     idiv rcx            ; rax = (4*c + d - l)/(c - a/2)
 
-    ; --- зберігаємо результат ---
+    ; --- saving result ---
     mov [res], rax
 
-    ; --- виклик printf ---
-    mov rdi, fmt        ; перший аргумент — формат
-    mov rsi, rax        ; другий аргумент — результат
-    xor rax, rax        ; для printf: число аргументів xmm = 0
+    ; --- call printf ---
+    mov rdi, fmt        ; first argument — format
+    mov rsi, rax        ; second argument — result
+    xor rax, rax        ; for printf: number of arguments xmm = 0
     call printf
 
-    ; --- вихід ---
+    ; --- end ---
     mov rax, 0
     ret
 
